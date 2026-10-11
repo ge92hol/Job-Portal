@@ -1,4 +1,3 @@
-import { assets } from '../assets/assets.js'
 import { useNavigate } from 'react-router-dom'
 
 const JobCard = ({ job }) => {
@@ -11,7 +10,7 @@ const JobCard = ({ job }) => {
       <div className='flex justify-between items-center'>
         <img
           className='h-8'
-          src={assets.company_icon}
+          src={job.companyId.image}
           alt=''
         />
       </div>

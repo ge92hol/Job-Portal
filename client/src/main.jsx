@@ -6,7 +6,10 @@ import App from './App.jsx'
 import { AppContextProvider } from './context/AppContext.jsx'
 
 createRoot(document.getElementById('root')).render(
-  <ClerkProvider afterSignOutUrl="/">
+  <ClerkProvider
+    publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+    afterSignOutUrl="/"
+  >
     <BrowserRouter>
       <AppContextProvider>
         <App />

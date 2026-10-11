@@ -6,8 +6,20 @@ import { AppContext } from '../context/AppContext.jsx'
 
 const Navbar = () => {
   const { openSignIn } = useClerk()
-  const { user } = useUser()
+  const { user, isLoaded } = useUser()
   const { setShowRecruiterLogin } = useContext(AppContext)
+
+  if (!isLoaded) {
+    return (
+      <div className='shadow py-4'>
+        <div className='container px-4 2xl:px-20 mx-auto flex justify-between items-center'>
+          <Link to='/'>
+            <img src={assets.logo} alt='' />
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className='shadow py-4'>

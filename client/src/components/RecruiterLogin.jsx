@@ -1,6 +1,9 @@
 import { useContext, useEffect, useState } from 'react'
 import { assets } from '../assets/assets.js'
 import { AppContext } from '../context/AppContext.jsx'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 const RecruiterLogin = () => {
   const [state, setState] = useState('Login')
@@ -9,14 +12,64 @@ const RecruiterLogin = () => {
   const [email, setEmail] = useState('')
   const [image, setImage] = useState(false)
   const [isTextDataSubmitted, setIsTextDataSubmitted] = useState(false)
+  const navigate = useNavigate()
 
-  const { setShowRecruiterLogin } = useContext(AppContext)
+  const {
+    setShowRecruiterLogin,
+    backendUrl,
+    setCompanyData,
+    setCompanyToken
+  } = useContext(AppContext)
 
   const onSubmitHandler = async (e) => {
     e.preventDefault()
 
     if (state === 'Sign Up' && !isTextDataSubmitted) {
-      setIsTextDataSubmitted(true)
+      return setIsTextDataSubmitted(true)
+    }
+
+    try {
+      if (state === 'Login') {
+        const { data } = await axios.post(
+          backendUrl + '/api/company/login',
+          {
+            email,
+            password
+          }
+        )
+
+        if (data.success) {
+          console.log(data)
+
+          setCompanyData(data.company)
+          setCompanyToken(data.token)
+          localStorage.setItem('companyToken', data.token)
+          setShowRecruiterLogin(false)
+          navigate('/dashboard')
+        }
+        else toast.error(data.message)
+
+      }
+      else {
+        const formData = new FormData()
+        formData.append('name', name)
+        formData.append('email', email)
+        formData.append('password', password)
+        formData.append('image', image)
+        const { data } = await axios.post(backendUrl + '/api/company/register', formData)
+        if (data.success) {
+          setCompanyData(data.company)
+          setCompanyToken(data.token)
+          localStorage.setItem('companyToken', data.token)
+          setShowRecruiterLogin(false)
+          navigate('/dashboard')
+        
+        } else {
+          toast.error(data.message)
+        }
+      }
+    } catch {
+      toast.error('An error occurred while submitting the form.')
     }
   }
 
@@ -51,6 +104,7 @@ const RecruiterLogin = () => {
                   src={image ? URL.createObjectURL(image) : assets.upload_area}
                   alt=''
                 />
+
                 <input
                   onChange={(e) => setImage(e.target.files[0])}
                   type='file'
@@ -69,6 +123,7 @@ const RecruiterLogin = () => {
             {state !== 'Login' && (
               <div className='border px-4 py-2 flex items-center gap-2 rounded-full mt-5'>
                 <img src={assets.person_icon} alt='' />
+
                 <input
                   className='outline-none text-sm'
                   onChange={(e) => setName(e.target.value)}
@@ -82,6 +137,7 @@ const RecruiterLogin = () => {
 
             <div className='border px-4 py-2 flex items-center gap-2 rounded-full mt-5'>
               <img src={assets.email_icon} alt='' />
+
               <input
                 className='outline-none text-sm'
                 onChange={(e) => setEmail(e.target.value)}
@@ -94,6 +150,7 @@ const RecruiterLogin = () => {
 
             <div className='border px-4 py-2 flex items-center gap-2 rounded-full mt-5'>
               <img src={assets.lock_icon} alt='' />
+
               <input
                 className='outline-none text-sm'
                 onChange={(e) => setPassword(e.target.value)}
